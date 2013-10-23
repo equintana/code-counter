@@ -1,4 +1,3 @@
-# code_counter.rb
 =begin
    Read the file that you pass by as first argument in the terminal and tell you how many line of code have that file.
    
@@ -7,44 +6,49 @@
    2. Empty lines.
    3. Block comments. Everything between =begin and =end.
 =end
+class CodeCounter
 
-IN_LINE_COMMENT = "#"
-START_BLOCK_COMMENT = "=begin"
-END_BLOCK_COMMENT = "=end"
+  IN_LINE_COMMENT = "#"
+  START_BLOCK_COMMENT = "=begin"
+  END_BLOCK_COMMENT = "=end"
 
-def is_line_of_code( line )
-  if line.empty? || line.start_with?( IN_LINE_COMMENT )
-    return false
-  end
-  return true
-end
-
-def count_lines( file_entered, print_lines_of_code )
-  file_to_read = file_entered ? file_entered : $0
   
-  lines_of_code = 0
-  block_comment_started = false
+  def count_lines( file_entered, print_lines_of_code )
+    file_to_read = file_entered ? file_entered : $0
+    
+    lines_of_code = 0
+    block_comment_started = false
 
-  File.open(file_to_read, 'r') do |file|  
-    while line = file.gets  
-      if block_comment_started
-          if line.start_with?( END_BLOCK_COMMENT )
-            block_comment_started = false
+    File.open(file_to_read, 'r') do |file|  
+      while line = file.gets  
+        if block_comment_started
+            if line.start_with?( END_BLOCK_COMMENT )
+              block_comment_started = false
+            end
+        elsif line.start_with?( START_BLOCK_COMMENT )
+            block_comment_started = true
+        elsif is_line_of_code( line.lstrip  )
+          lines_of_code = lines_of_code + 1
+          if print_lines_of_code 
+            puts " #{lines_of_code}> #{line}"
           end
-      elsif line.start_with?( START_BLOCK_COMMENT )
-          block_comment_started = true
-      elsif is_line_of_code( line.lstrip  )
-        lines_of_code = lines_of_code + 1
-        if print_lines_of_code 
-          puts " #{lines_of_code}> #{line}"
         end
       end
     end
+    lines_of_code
   end
-  lines_of_code
+
+  def is_line_of_code( line )
+    if line.empty? || line.start_with?( IN_LINE_COMMENT )
+      return false
+    end
+    return true
+  end
+
 end
 
 filename = ARGV.first
 puts "You entered %s" % ( filename ? filename : "nothing, so I will read my own file" )
-lines_of_code = count_lines(filename, false)
-puts '%i LOC' % lines_of_code
+
+@counter = CodeCounter.new
+puts '%i LOC' % @counter.count_lines(filename, false)
