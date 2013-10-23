@@ -12,10 +12,11 @@ class CodeCounter
   START_BLOCK_COMMENT = "=begin"
   END_BLOCK_COMMENT = "=end"
 
+  attr_accessor :print_lines_of_code
+
+  def count_lines( file_entered )
   
-  def count_lines( file_entered, print_lines_of_code )
     file_to_read = file_entered ? file_entered : $0
-    
     lines_of_code = 0
     block_comment_started = false
 
@@ -29,7 +30,7 @@ class CodeCounter
             block_comment_started = true
         elsif is_line_of_code( line.lstrip  )
           lines_of_code = lines_of_code + 1
-          if print_lines_of_code 
+          if @print_lines_of_code 
             puts " #{lines_of_code}> #{line}"
           end
         end
@@ -50,5 +51,6 @@ end
 filename = ARGV.first
 puts "You entered %s" % ( filename ? filename : "nothing, so I will read my own file" )
 
-@counter = CodeCounter.new
-puts '%i LOC' % @counter.count_lines(filename, false)
+counter = CodeCounter.new 
+counter.print_lines_of_code = false
+puts '%i LOC' % counter.count_lines(filename)
