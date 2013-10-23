@@ -6,7 +6,7 @@ Code counter
 What is code counter?
 --
 This is a script read the file that you pass by as first argument in the terminal and tell you how many line of code have that file.
-	
+
 	You entered my_file.rb
 	13 LOC
 
@@ -18,6 +18,6 @@ How to use
 
 What is not a line of code?
 --
-- In line comments. Every line  start with #)
+- In line comments. Every line  start with #
 - Empty lines
 - Block comments. Everything between =begin and =end
