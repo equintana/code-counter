@@ -1,4 +1,5 @@
-
+#86 LOC using Enumerable
+require 'csv'
 class Sample
 
   attr_accessor :x, :y
@@ -18,19 +19,18 @@ class Stats
   attr_accessor :round
   
   def initialize(round)
-      @round = round
+    @round = round
   end
 
-  def calculate_b1(test)
-    b1 = 0
-    n = test.size
+  def calculate_b1(samples)
+    n = samples.size
 
-    data_x = test.collect{ |i| i.x }
-    data_y = test.collect{ |i| i.y }
+    data_x = samples.collect{ |i| i.x }
+    data_y = samples.collect{ |i| i.y }
     average_x = average( data_x )
     average_y = average( data_y )
 
-    part_1 = summation_x_multiplied_y( test )
+    part_1 = summation_x_multiplied_y( samples )
     part_2 = n * average_x * average_y
     part_3 = summation_power_of_two( data_x )
     part_4 = n * ( average_x * average_x )
@@ -39,25 +39,23 @@ class Stats
     b1.round(@round)
   end
 
-  def calculate_b0(b1, test)
-    b0 = 0
-    average_x = average(test.collect{ |i| i.x})
-    average_y = average(test.collect{ |i| i.y})
+  def calculate_b0(b1, samples)
+    average_x = average( samples.collect{ |i| i.x} )
+    average_y = average( samples.collect{ |i| i.y} )
 
     b0 = average_y - (b1 * average_x)
     b0.round(@round)
   end
 
-  def calculate_r(test)
-    r = 0
-    n = test.size
+  def calculate_r(samples)
+    n = samples.size
 
-    data_x = test.collect{ |i| i.x }
-    data_y = test.collect{ |i| i.y }
-    summation_x = summation(data_x)
-    summation_y = summation(data_y)
+    data_x = samples.collect{ |i| i.x }
+    data_y = samples.collect{ |i| i.y }
+    summation_x = data_x.reduce(:+)
+    summation_y = data_y.reduce(:+)
 
-    part_1 = n * summation_x_multiplied_y( test )
+    part_1 = n * summation_x_multiplied_y( samples )
     part_2 = summation_x * summation_y
     part_3 = ( n * summation_power_of_two( data_x ) ) - ( summation_x**2 )
     part_4 = ( n * summation_power_of_two( data_y ) ) - ( summation_y**2 )
@@ -76,59 +74,38 @@ class Stats
     p.round(@round)
   end
 
-  def summation(data)
-    sum = 0
-    data.each do |i|
-      sum += i
-    end
-    sum
-  end
-
   def average(data)
-    avg = summation(data) / data.size
+    data.reduce(:+) / data.count
   end
 
-  def summation_x_multiplied_y(test)
-    sum = 0
-    test.each do |sample|
-      sum += sample.x * sample.y 
-    end
-    sum
+  def summation_x_multiplied_y(samples)
+    samples.inject(0){ |sum, sample| (sample.x * sample.y) + sum }
   end
 
   def summation_power_of_two(data)
-    sum = 0
-    data.each do |i|
-      sum += i**2
-    end
-    sum
+    data.inject(0){ |sum_power, i| i**2 + sum_power }
   end
-
 end
 
-def extract_data( x , y )
-  test = Array.new
-  File.open('stats.txt', 'r') do |file|  
-    while line = file.gets  
-      data = line.lstrip.chomp.split(',')
-      test.push(Sample.new(data[x].to_f , data[y].to_f ))
-     end
+def extract_data_csv(filename)
+  samples = Array.new
+  CSV.foreach(filename) do |row|
+    samples = samples.push(Sample.new(row[0].to_f, row[1].to_f))
   end
-  test
+  samples
 end
+
+filename = ARGV.first 
+samples = extract_data_csv( filename )
 
 stats = Stats.new(4)
-combinations = [ { "x" => 0 , "y" => 2 }, { "x" => 0 , "y" => 3 } , { "x" => 1 , "y" => 2 } , { "x" => 1 , "y" => 3 } ]
-combinations.each_with_index do |c, index|
-  test = extract_data(  c["x"], c["y"] )
-  b1 = stats.calculate_b1(test)
-  b0 = stats.calculate_b0(b1, test)
-  r = stats.calculate_r(test)
-  r2 = stats.calcuate_r_power_two(r)
-  p = stats.calculate_prediction(b0, b1)
+b1 = stats.calculate_b1(samples)
+b0 = stats.calculate_b0(b1, samples)
+r = stats.calculate_r(samples)
+r2 = stats.calcuate_r_power_two(r)
+p = stats.calculate_prediction(b0, b1)
 
-  puts "Test #{index+1} > b0: #{b0}, b1: #{b1}, r: #{r}, r2: #{r2}, p:#{p}"
-end
+puts "Test #{filename}> b0: #{b0}, b1: #{b1}, r: #{r}, r2: #{r2}, p:#{p}"
 
 
 
