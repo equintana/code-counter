@@ -1,7 +1,8 @@
 Code counter
 ====
-- By Erlinis Quintana 
-- erlinis.quintana@koombea.com
+By Erlinis Quintana 
+
+- First assignment
 
 What is code counter?
 --
@@ -27,9 +28,10 @@ What is not a line of code?
 
 Stats
 ==
+- Second assignment
 
-What is code counter?
---
+What is stats?
+-
 Stats is a script which given a CSV file compound for 2 columns with samples data, where first one means 'x' and second one is means 'y' is capable to calculate:
 - Regression parameters: βo and β₁
 - Improved prediction: P,  where P = βo + β₁ * E ( E=386 )
