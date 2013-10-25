@@ -1,20 +1,6 @@
 #86 LOC using Enumerable
 require 'csv'
 
-class Sample
-
-  attr_accessor :x, :y
-  attr_reader :x, :y
-
-  def initialize(x,y)
-    @x, @y = x, y
-  end
-
-  def to_s
-    puts "x:#{x}, y:#{y}"
-  end
-end
-
 class Stats
 
   E = 386
@@ -79,15 +65,15 @@ end
 def extract_data_csv(filename)
   samples = Array.new
   CSV.foreach(filename) do |row|
-    samples = samples.push(Sample.new(row[0].to_f, row[1].to_f))
+    samples.push( [ row[0].to_f, row[1].to_f ] )
   end
   samples
 end
 
 filename = ARGV.first 
 samples = extract_data_csv( filename )
-data_x = samples.collect{ |i| i.x }
-data_y = samples.collect{ |i| i.y }
+data_x = samples.collect{ |i| i[0]} 
+data_y = samples.collect{ |i| i[1]} 
 
 stats = Stats.new(4)
 b1 = stats.calculate_b1(data_x, data_y)
